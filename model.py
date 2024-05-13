@@ -139,3 +139,13 @@ if __name__ == '__main__':
 
     # Save the model
     torch.save(mlp.state_dict(), 'mlp_model.pth')
+
+
+# list of point coordinates as information of geometric structure? --> PointNet, but others do that
+# --> encode different lattice structures as discrete classes without giving further information (one-hot encoding)?
+
+# add visualization for model training and evaluation (pylightning?)
+
+# CSV reading script for input data and input parameters of NN?
+
+# we only have around 100 data points
