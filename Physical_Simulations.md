@@ -19,6 +19,6 @@ Physical Simulation Steps
 | -------------------------------- | --------------- |---------------|----------------|
 | lattice_d_cell [1.9,2.75]        | 1.9,2.375,2.75  |1.9,2.375,2.75 |1.9,2.375,2.75  |
 | lattice_d_rod [0.2,1.2]          | step 0.05       |step 0.05      |step 0.05       |
-| scalingfactor_x_y [1,8]          | 3               |4              |6               |
+| scalingfactor_x_y [1,6]          | 3               |4              |6               |
 
 the lattice_d_rod has the highest impact on porosity
