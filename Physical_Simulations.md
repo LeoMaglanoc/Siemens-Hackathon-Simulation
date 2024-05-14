@@ -20,5 +20,11 @@ Physical Simulation Steps
 | lattice_d_cell [1.9,2.75]        | 1.9,2.375,2.75  |1.9,2.375,2.75 |1.9,2.375,2.75  |
 | lattice_d_rod [0.2,1.2]          | step 0.05       |step 0.05      |step 0.05       |
 | scalingfactor_x_y [1,6]          | 3               |4              |6               |
-
+| lattice_num [1,4]                | 2               |2              |2               |
+| load                             | 100N            | 100N          | 100N           |
 the lattice_d_rod has the highest impact on porosity
+
+Extract data: .csv file
+-----------------------------
+The first a few lines are CAD expressions/parameters, then the displacement vector $U$.
+We need to calculate the Young modulus/effective stiffness $E$ from the mean value of $U$
