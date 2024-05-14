@@ -22,6 +22,7 @@ Physical Simulation Steps
 | scalingfactor_x_y [1,6]          | 3               |4              |6               |
 | lattice_num [1,4]                | 2               |2              |2               |
 | load                             | 100N            | 100N          | 100N           |
+
 the lattice_d_rod has the highest impact on porosity
 
 Extract data: .csv file
