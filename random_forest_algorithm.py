@@ -4,6 +4,8 @@
 """
 
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import GridSearchCV
 import numpy as np
 import pickle
 
@@ -17,6 +19,11 @@ def get_training_data():
     X = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ'],]).T
     y = np.array(a['effective_stiffness'])
     return X, y
+
+
+def preprocess_data(X: np.array) -> np.array:
+    scaler = StandardScaler()
+    return scaler.fit_transform(X)
 
 
 def train_rf_model(X_train, y_train, depth: int) -> RandomForestRegressor:
@@ -45,6 +52,7 @@ def create_rf_model():
     mse_errors = np.zeros(9)
     rf_models = []
     X_train, y_train = get_training_data()
+    X_train = preprocess_data(X_train)
     for depth in range(1, 10):
         rf_models.append(train_rf_model(X_train, y_train, depth))
         mse_errors[depth-1] = validate_rf_model(rf_models[depth-1])
@@ -55,6 +63,7 @@ def create_rf_model():
 
 
 def predict_effective_stiffness(X: np.array):
+    X = preprocess_data(X)
     rf_model = pickle.load(open(RFMODELNAME, 'rb'))
     return rf_model.predict(X)
 
