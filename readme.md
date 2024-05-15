@@ -1,5 +1,7 @@
 Physical Simulation Steps
 -------------------------------
+- training and validation data is overlapping
+- seperate some additional test data apart from training and validation data?
 - make geometry/mesh/analysis of deformation in Simcenter 3D
 - close every file in Simcenter 3D
 - Heeds (Anaylsis Portal: Simcenter 3D_2306)
