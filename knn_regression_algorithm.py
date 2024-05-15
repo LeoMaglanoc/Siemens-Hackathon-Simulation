@@ -9,17 +9,17 @@ from sklearn.neighbors import KNeighborsRegressor
 
 KNEIGHBORS = 2
 KNNMODELNAME = 'knn_model.pth'
-PATHTRAININGDATA = './data/output.csv'
+PATHTRAININGDATA = './data/training.csv'
 
-def getTrainingData():
-    a = np.genfromtxt(PATHTRAININGDATA, dtype=None, delimiter=',', skip_header=1, names=['lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','young_modulus','density'])
+def get_training_data():
+    a = np.genfromtxt(PATHTRAININGDATA, dtype=None, delimiter=',', skip_header=1, names=['id', 'lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','effective_stiffness'])
     #X = np.array([lattice_d_cell,lattice_d_rod,lattice_number_cells_x,scaling_factor_YZ, density]).T
     #y = np.array(young_modulus)
-    X = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ'],a['density']]).T
-    y = np.array(a['young_modulus'])
+    X = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ']]).T
+    y = np.array(a['effective_stiffness'])
     return X, y
 
-def createKnnModel(X, y):
+def create_knn_model(X, y):
     knn_model = KNeighborsRegressor(KNEIGHBORS)
     knn_model.fit(X, y)
     knn_Pickle = open(KNNMODELNAME, 'wb') # open in binary mode!
@@ -32,5 +32,5 @@ def predict_effective_stiffness(X: np.array):
     return knn_model.predict(X)
 
 if __name__ == '__main__':
-    X_train, y_train = getTrainingData()
-    createKnnModel(X_train, y_train)
+    X_train, y_train = get_training_data()
+    create_knn_model(X_train, y_train)
