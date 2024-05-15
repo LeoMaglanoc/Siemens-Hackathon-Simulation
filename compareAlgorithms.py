@@ -5,17 +5,32 @@
 import numpy as np
 import knn_regression_algorithm as knnr
 
-def main(X):
-    """
-        Estimate the effective stiffness with different machine learning methods
-        X - Input Parameters
-            Format: np array 1x5 vector like [[lattice_d_cell, lattice_d_rod, lattice_number_cells_x, scaling_factor_YZ, density]]
-    """
+def knn(X):
     result_knn = knnr.predict_effective_stiffness(X)
     print("Knn: " + str(result_knn[0]) + " MPa")
-    # random forrest
-    # neural network
-    
+    return result_knn[0]    
+
+def random_forest(X):
+    return 0
+
+def mlp(X):
+    return 0
+
+def point_cloud_nn(X):
+    return 0
+
 if __name__ == '__main__':
-    X = np.array([[3, 4, 2, 1, 6]])
-    main(X)
+    """
+    Estimate the effective stiffness with different machine learning methods
+    X - Input Parameters
+    Format: np array 1x4 vector like [[lattice_d_cell, lattice_d_rod, lattice_number_cells_x, scaling_factor_YZ]]
+    """
+    X = np.array([[4, 2, 1, 6]])
+    knn(X)
+    # TODO: random forest
+    random_forest(X)
+    # TODO: mlp
+    mlp(X)
+    # TODO: point_cloud_nn
+    point_cloud_nn(X)
+
