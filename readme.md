@@ -17,15 +17,26 @@ Physical Simulation Steps
 
 | variables (CAD expressions)      | computer 1      |computer 2     |computer 3      |
 | -------------------------------- | --------------- |---------------|----------------|
-| lattice_d_cell [1.9,2.75]        | 1.9,2.375,2.75  |1.9,2.375,2.75 |1.9,2.375,2.75  |
+| lattice_d_cell [1.9,2.75]        | 2.375,2.75      |1.9            |1.9,2.375,2.75  |
 | lattice_d_rod [0.2,1.2]          | step 0.05       |step 0.05      |step 0.05       |
-| scalingfactor_x_y [1,6]          | 3               |4              |6               |
+| scaling_factor_YZ [1,6]          | 3               |3              |6               |
 | lattice_num [1,4]                | 2               |2              |2               |
 | load                             | 100N            | 100N          | 100N           |
 
 the lattice_d_rod has the highest impact on porosity
 
-Extract data: .csv file
+Extract data: .xml file
 -----------------------------
-The first a few lines are CAD expressions/parameters, then the displacement vector $U$.
-We need to calculate the Young modulus/effective stiffness $E$ from the mean value of $U$
+- Young modulus
+
+  The first a few lines are CAD expressions/parameters, then the displacement vector $U$.
+We need to calculate the Young modulus/effective stiffness $E$ from the mean value of $U$, i.e. $\Delta U$
+$$E=\frac{\sigma}{\epsilon}=\frac{FU_0}{A\Delta U}$$
+where $\sigma = \frac{F}{A}$ is the stress, F is the fixed load on area $A =$ h_total_z $\times$ w_total_y (depending on scaling factor), and $U\_0$ is d_total_x 
+
+- Porosity
+  
+  For presentation, we need to calculate porousity $P$
+  $$1-P = \frac{V_{mesh}}{V_{total}}$$
+  where $V_{total} = $ h_total_z $\times$ w_total_y $\times$ d_total_x, $V_{mesh}$ corresponds to the "Volume" in the data file
+
