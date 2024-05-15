@@ -56,7 +56,7 @@ class MLP(nn.Module):
     def __init__(self):
         super().__init__()
         self.layers = nn.Sequential(
-            nn.Linear(8, 64),
+            nn.Linear(5, 64),
             nn.ReLU(),
             nn.Linear(64, 32),
             nn.ReLU(),
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     torch.manual_seed(42)
 
     # Create the dataset instances
-    dataset = CSVDataset('data/california_housing.csv')
+    dataset = CSVDataset('data/output.csv')
 
     # Split the data into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(dataset.X.numpy(), dataset.y.numpy(), test_size=0.2, random_state=42)
@@ -142,6 +142,7 @@ if __name__ == '__main__':
     # Close the TensorBoard writer
     writer.close()
 
+# inference script which takes saved model and dummy inputs and outputs stiffness
 
 # list of point coordinates as information of geometric structure? --> PointNet, but others do that
 # --> encode different lattice structures as discrete classes without giving further information (one-hot encoding)?

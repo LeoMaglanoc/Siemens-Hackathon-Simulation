@@ -1,1 +1,4 @@
-data/*.xml
+data/simulation_data_1/*.xml
+data/simulation_data_2/*.xml
+__pycache__
+runs
