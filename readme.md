@@ -36,5 +36,6 @@ where $\sigma = \frac{F}{A}$ is the stress, F is the fixed load on area $A =$ h_
 
 - Porosity
   For presentation, we need to calculate porousity $P$
-  $$1-P = \frac{V_{mesh}}{V_total}$$
+  $$1-P = \frac{V_{mesh}}{V_{total}$$
+  where $V_{total} = $ h_total_z $\times$ w_total_y $\times$ d_total_x, $V_{mesh}$ corresponds to the "Volume" in the data file
 
