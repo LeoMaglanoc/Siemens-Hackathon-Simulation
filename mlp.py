@@ -1,33 +1,13 @@
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-from sklearn.datasets import fetch_california_housing
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
 from torch.utils.tensorboard import SummaryWriter
-import numpy as np
 import pandas as pd
+import numpy as np
 
 # Define the Dataset class
-class Dataset(torch.utils.data.Dataset):
-    '''
-    Prepare the dataset for regression
-    '''
-    def __init__(self, X, y, scale_data=True):
-        if not torch.is_tensor(X) and not torch.is_tensor(y):
-            # Apply scaling if necessary
-            if scale_data:
-                X = StandardScaler().fit_transform(X)
-            self.X = torch.from_numpy(X).float()
-            self.y = torch.from_numpy(y).float().reshape(-1, 1)
-
-    def __len__(self):
-        return len(self.X)
-
-    def __getitem__(self, i):
-        return self.X[i], self.y[i]
-
-class CSVDataset(Dataset):
+class CSVDataset(torch.utils.data.Dataset):
     def __init__(self, source, scale_data=True):
         # Read the CSV file or DataFrame
         if isinstance(source, str):
@@ -35,9 +15,10 @@ class CSVDataset(Dataset):
         else:
             df = source
         
-        # Assume the last column is the target and the rest are features
-        X = df.iloc[:, :-1].values
-        y = df.iloc[:, -1].values
+        # Assume the first column is the ID, the last column is the target, and the rest are features
+        self.ids = df.iloc[:, 0].values  # ID column
+        X = df.iloc[:, 1:-1].values      # Feature columns
+        y = df.iloc[:, -1].values        # Target column
         
         # Apply scaling if necessary
         if scale_data:
@@ -47,6 +28,11 @@ class CSVDataset(Dataset):
         self.X = torch.tensor(X, dtype=torch.float32)
         self.y = torch.tensor(y, dtype=torch.float32).reshape(-1, 1)
 
+    def __len__(self):
+        return len(self.X)
+
+    def __getitem__(self, i):
+        return self.X[i], self.y[i]
 
 # Define the MLP class
 class MLP(nn.Module):
@@ -56,7 +42,7 @@ class MLP(nn.Module):
     def __init__(self):
         super().__init__()
         self.layers = nn.Sequential(
-            nn.Linear(5, 64),
+            nn.Linear(4, 64),  # Adjust input size based on features
             nn.ReLU(),
             nn.Linear(64, 32),
             nn.ReLU(),
@@ -69,28 +55,34 @@ class MLP(nn.Module):
         '''
         return self.layers(x)
 
+# Function to load the model
+def load_model(model_path):
+    model = MLP()
+    model.load_state_dict(torch.load(model_path))
+    model.eval()
+    return model
+
+# Inference function
+def predict_effective_stiffness(X):
+    model = load_model('mlp_model.pth')
+    if not torch.is_tensor(X):
+        X = torch.tensor(X, dtype=torch.float32)
+    with torch.no_grad():
+        prediction = model(X)
+    return prediction.numpy()
+
 # Main script
 if __name__ == '__main__':
     # Set fixed random number seed
     torch.manual_seed(42)
 
     # Create the dataset instances
-    dataset = CSVDataset('data/output.csv')
-
-    # Split the data into train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(dataset.X.numpy(), dataset.y.numpy(), test_size=0.2, random_state=42)
-
-    # Create DataFrames from split data
-    train_df = pd.DataFrame(data=np.hstack((X_train, y_train.reshape(-1, 1))))
-    test_df = pd.DataFrame(data=np.hstack((X_test, y_test.reshape(-1, 1))))
-
-    # Create datasets from split data
-    train_dataset = CSVDataset(train_df)
-    test_dataset = CSVDataset(test_df)
+    train_dataset = CSVDataset('data/training.csv')
+    val_dataset = CSVDataset('data/validation.csv')
 
     # Create DataLoaders
     train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True, num_workers=0)
-    test_loader = DataLoader(test_dataset, batch_size=10, shuffle=False, num_workers=0)
+    val_loader = DataLoader(val_dataset, batch_size=10, shuffle=False, num_workers=0)
 
     # Initialize the MLP
     mlp = MLP()
@@ -121,20 +113,20 @@ if __name__ == '__main__':
 
     print('Training process has finished.')
 
-    # Evaluate the model on test data
+    # Evaluate the model on validation data
     mlp.eval()
-    test_loss = 0.0
+    val_loss = 0.0
 
     with torch.no_grad():
-        for i, data in enumerate(test_loader):
+        for i, data in enumerate(val_loader):
             inputs, targets = data
             outputs = mlp(inputs)
             loss = loss_function(outputs, targets)
-            test_loss += loss.item()
-            writer.add_scalar('Loss/test', loss.item(), epoch * len(test_loader) + i)
+            val_loss += loss.item()
+            writer.add_scalar('Loss/val', loss.item(), epoch * len(val_loader) + i)
 
-    average_test_loss = test_loss / len(test_loader.dataset)
-    print(f'Average test loss: {average_test_loss:.3f}')
+    average_val_loss = val_loss / len(val_loader.dataset)
+    print(f'Average validation loss: {average_val_loss:.3f}')
 
     # Save the model
     torch.save(mlp.state_dict(), 'mlp_model.pth')

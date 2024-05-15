@@ -4,6 +4,7 @@
 
 import numpy as np
 import knn_regression_algorithm as knnr
+import mlp as mlp_module
 
 def knn(X):
     result_knn = knnr.predict_effective_stiffness(X)
@@ -14,7 +15,9 @@ def random_forest(X):
     return 0
 
 def mlp(X):
-    return 0
+    result_mlp = mlp_module.predict_effective_stiffness(X)
+    print("Mlp: " + str(result_mlp[0][0]) + " MPa")
+    return result_mlp
 
 def point_cloud_nn(X):
     return 0
