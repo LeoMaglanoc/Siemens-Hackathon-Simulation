@@ -12,7 +12,7 @@ def main(X):
             Format: np array 1x5 vector like [[lattice_d_cell, lattice_d_rod, lattice_number_cells_x, scaling_factor_YZ, density]]
     """
     result_knn = knnr.predict_effective_stiffness(X)
-    print("Knn: " + str(result_knn[0]) + " GPa")
+    print("Knn: " + str(result_knn[0]) + " MPa")
     # random forrest
     # neural network
     
