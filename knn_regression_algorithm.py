@@ -11,18 +11,13 @@ from sklearn.neighbors import KNeighborsRegressor
 KNNMODELNAME = 'knn_model.pth'
 PATHTRAININGDATA = './data/training.csv'
 PATHVALIDATIONDATA = './data/validation.csv'
+PARAMETERS = ['id', 'lattice_d_cell', 'lattice_d_rod', 'lattice_number_cells_x', 'scaling_factor_YZ']
+TARGET = 'effective_stiffness'
 
-def get_training_data():
-    a = np.genfromtxt(PATHTRAININGDATA, dtype=None, delimiter=',', skip_header=1, names=['id', 'lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','effective_stiffness'])
-    X = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ']]).T
-    y = np.array(a['effective_stiffness'])
-    return X, y
-
-
-def get_validation_data():
-    a = np.genfromtxt(PATHVALIDATIONDATA, dtype=None, delimiter=',', skip_header=1, names=['id', 'lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','effective_stiffness'])
-    X = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ']]).T
-    y = np.array(a['effective_stiffness'])
+def get_data(path):
+    a = np.genfromtxt(path, dtype=None, delimiter=',', skip_header=1, names=PARAMETERS + [TARGET])
+    X = np.array([a[PARAMETERS[1]],a[PARAMETERS[2]],a[PARAMETERS[3]],a[PARAMETERS[4]]]).T
+    y = np.array(a[TARGET])
     return X, y
 
 
@@ -33,12 +28,8 @@ def train_knn_model(X: np.array, y: np.array, k_neighbors: int) -> KNeighborsReg
 
 
 def validate_knn_model(knn_model: KNeighborsRegressor) -> float:
-    X_val, y_val = get_validation_data()
+    X_val, y_val = get_data(PATHVALIDATIONDATA)
     y_calc = knn_model.predict(X_val)
-    print([y_calc, y_val])
-    diff = y_calc - y_val
-    diff_squared = diff ** 2
-    mse = np.mean(diff_squared)
     mse = np.mean((y_calc - y_val) ** 2)
     return mse
 
@@ -54,7 +45,7 @@ def create_knn_model():
     print("Creating knn model...")
     mse_errors = np.zeros(9)
     knn_models = []
-    X_train, y_train = get_training_data()
+    X_train, y_train = get_data(PATHTRAININGDATA)
     for k_neighbors in range(1, 10):
         knn_models.append(train_knn_model(X_train, y_train, k_neighbors))
         mse_errors[k_neighbors-1] = validate_knn_model(knn_models[k_neighbors-1])
