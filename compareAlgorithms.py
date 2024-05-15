@@ -28,7 +28,7 @@ if __name__ == '__main__':
     X - Input Parameters
     Format: np array 1x4 vector like [[lattice_d_cell, lattice_d_rod, lattice_number_cells_x, scaling_factor_YZ]]
     """
-    X = np.array([[4, 2, 1, 6]])
+    X = np.array([[2.375,0.7,2.0,6.0]])
     knn(X)
     # TODO: random forest
     random_forest(X)

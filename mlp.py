@@ -22,8 +22,10 @@ class CSVDataset(torch.utils.data.Dataset):
         
         # Apply scaling if necessary
         if scale_data:
-            scaler = StandardScaler()
-            X = scaler.fit_transform(X)
+            self.scaler_X = StandardScaler()
+            self.scaler_y = StandardScaler()
+            X = self.scaler_X.fit_transform(X)
+            y = self.scaler_y.fit_transform(y.reshape(-1, 1)).flatten()
         
         self.X = torch.tensor(X, dtype=torch.float32)
         self.y = torch.tensor(y, dtype=torch.float32).reshape(-1, 1)
@@ -42,12 +44,13 @@ class MLP(nn.Module):
     def __init__(self):
         super().__init__()
         self.layers = nn.Sequential(
-            nn.Linear(4, 64),  # Adjust input size based on features
-            nn.ReLU(),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, 1)
+            nn.Linear(4, 4),  
+            nn.Softplus(),
+            nn.Linear(4, 4),
+            nn.Softplus()
         )
+        self.train_scaler_X = None 
+        self.train_scaler_y = None
 
     def forward(self, x):
         '''
@@ -67,9 +70,10 @@ def predict_effective_stiffness(X):
     model = load_model('mlp_model.pth')
     if not torch.is_tensor(X):
         X = torch.tensor(X, dtype=torch.float32)
+    X = model.train_scaler_X.transform(X)
     with torch.no_grad():
         prediction = model(X)
-    return prediction.numpy()
+    return model.train_scaler_y.inverse_transform(prediction.numpy())
 
 # Main script
 if __name__ == '__main__':
@@ -81,21 +85,23 @@ if __name__ == '__main__':
     val_dataset = CSVDataset('data/validation.csv')
 
     # Create DataLoaders
-    train_loader = DataLoader(train_dataset, batch_size=10, shuffle=True, num_workers=0)
-    val_loader = DataLoader(val_dataset, batch_size=10, shuffle=False, num_workers=0)
+    train_loader = DataLoader(train_dataset, batch_size=len(train_dataset), shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_dataset, batch_size=len(val_dataset), shuffle=False, num_workers=0)
 
     # Initialize the MLP
     mlp = MLP()
+    mlp.train_scaler_X = train_dataset.scaler_X 
+    mlp.train_scaler_y = train_dataset.scaler_y
 
     # Define the loss function and optimizer
     loss_function = nn.MSELoss()
-    optimizer = torch.optim.Adam(mlp.parameters(), lr=1e-4)
+    optimizer = torch.optim.Adam(mlp.parameters(), lr=1e0)
 
     # Initialize TensorBoard writer
     writer = SummaryWriter(log_dir='runs/')
 
     # Run the training loop
-    for epoch in range(5):
+    for epoch in range(100):
         print(f'Starting epoch {epoch+1}')
         current_loss = 0.0
 
@@ -133,6 +139,8 @@ if __name__ == '__main__':
 
     # Close the TensorBoard writer
     writer.close()
+
+# TODO: add data inverse normalization to MLP inference
 
 # inference script which takes saved model and dummy inputs and outputs stiffness
 
