@@ -35,6 +35,7 @@ $$E=\frac{\sigma}{\epsilon}=\frac{FU_0}{A\Delta U}$$
 where $\sigma = \frac{F}{A}$ is the stress, F is the fixed load on area $A =$ h_total_z $\times$ w_total_y (depending on scaling factor), and $U\_0$ is d_total_x 
 
 - Porosity
+  
   For presentation, we need to calculate porousity $P$
   $$1-P = \frac{V_{mesh}}{V_{total}}$$
   where $V_{total} = $ h_total_z $\times$ w_total_y $\times$ d_total_x, $V_{mesh}$ corresponds to the "Volume" in the data file
