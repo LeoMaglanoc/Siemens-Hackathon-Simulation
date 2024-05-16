@@ -35,6 +35,7 @@ def train_rf_model(X_train, y_train, depth: int) -> RandomForestRegressor:
 def validate_rf_model(rf_model: RandomForestRegressor) -> float:
     a = np.genfromtxt(PATHVALIDATIONDATA, dtype=None, delimiter=',', skip_header=1, names=['id','lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','effective_stiffness'])
     X_val = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ'],]).T
+    X_val = preprocess_data(X_val)
     y_val = np.array(a['effective_stiffness'])
     mse = np.mean((rf_model.predict(X_val) - y_val) ** 2)
     return mse

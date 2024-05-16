@@ -1,5 +1,7 @@
 Physical Simulation Steps
 -------------------------------
+- training and validation data is overlapping
+- seperate some additional test data apart from training and validation data?
 - make geometry/mesh/analysis of deformation in Simcenter 3D
 - close every file in Simcenter 3D
 - Heeds (Anaylsis Portal: Simcenter 3D_2306)
@@ -38,5 +40,7 @@ where $\sigma = \frac{F}{A}$ is the stress, F is the fixed load on area $A =$ h_
   
   For presentation, we need to calculate porousity $P$
   $$1-P = \frac{V_{mesh}}{V_{total}}$$
-  where $V_{total} = $ h_total_z $\times$ w_total_y $\times$ d_total_x, $V_{mesh}$ corresponds to the "Volume" in the data file
-
+  where $V_{mesh} = V_{lattice} + 2V_{plates}$, $V_{total} = V_{cube} + 2V_{plates}$
+  $$V_{lattice} = 8\times\frac{d_{cell}}{\sqrt{2}}\times\pi\times(\frac{d_{rod}}{2})^{2}\times ScalingFactor \times LatticeNum$$
+  $$V_{cube} = d_{cell}^{3}\times ScalingFactor \times LatticeNum$$
+  $$V_{plates} = 1.5 \times d_{cell}^{2}\times ScalingFactor \times LatticeNum$$
