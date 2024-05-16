@@ -94,7 +94,7 @@ def main(folder_path, train_csv, val_csv):
     # Split the data into training (70%) and validation (30%) sets
     split_idx = int(len(all_data) * 0.7)
     train_data = all_data[:split_idx]
-    val_data = all_data[split_idx:]
+    val_data = all_data[split_idx+1:]
 
     # Define the CSV file headers
     headers = ['ID', 'lattice_d_cell', 'lattice_d_rod', 'lattice_number_cells_x', 'scaling_factor_YZ', 'effective_stiffness']
@@ -118,7 +118,7 @@ def main(folder_path, train_csv, val_csv):
 
 # Example usage
 if __name__ == "__main__":
-    folder_path = 'data'  # Replace with the path to your folder containing XML files
+    folder_path = 'data/simulation_data_3'  # Replace with the path to your folder containing XML files
     train_csv = 'data/training.csv'  # Replace with the desired output training CSV file path
     val_csv = 'data/validation.csv'  # Replace with the desired output validation CSV file path
     main(folder_path, train_csv, val_csv)
