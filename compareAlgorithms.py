@@ -5,6 +5,7 @@
 import numpy as np
 import knn_regression_algorithm as knnr
 import mlp as mlp_module
+import torch
 
 def knn(X):
     result_knn = knnr.predict_effective_stiffness(X)
