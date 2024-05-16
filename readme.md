@@ -41,7 +41,7 @@ where $\sigma = \frac{F}{A}$ is the stress, F is the fixed load on area $A =$ h_
   For presentation, we need to calculate porousity $P$
   $$1-P = \frac{V_{mesh}}{V_{total}}$$
   where $V_{mesh} = V_{lattice} + 2V_{plates}$, $V_{total} = V_{cube} + 2V_{plates}$
-  $$V_{lattice} = 8\times\frac{\sqrt{3}d_{cell}}{2}}\times\pi\times(\frac{d_{rod}}{2})^{2}\times ScalingFactor^{2} \times LatticeNum$$
+  $$V_{lattice} = 8\times\frac{\sqrt{3}d_{cell}}{2}\times\pi\times(\frac{d_{rod}}{2})^{2}\times ScalingFactor^{2} \times LatticeNum$$
   $$V_{cube} = d_{cell}^{3}\times ScalingFactor^{2} \times LatticeNum$$
   $$V_{plates} = 1.5 \times d_{cell}^{2}\times ScalingFactor^{2} \times LatticeNum$$
 }
