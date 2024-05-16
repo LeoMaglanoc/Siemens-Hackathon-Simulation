@@ -10,6 +10,7 @@ from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
 from sklearn.preprocessing import StandardScaler
 import preprocess_data as pd
 import matplotlib.pyplot as plt
+import time
 
 GPRMODELNAME = 'gpr_model.pth'
 PATHTRAININGDATA = './data/training.csv'
@@ -40,7 +41,11 @@ def mean_square_error(y_pred: np.array, y_gt: np.array):
 
 def validate_gpr_model():
     X, y = pd.get_data(pd.PATHVALIDATIONDATA)
+    start = time.perf_counter()
     y_pred = predict_effective_stiffness(X)
+    end = time.perf_counter()
+    duration = end-start
+    print("Prediction took " + str(duration) + " sec to complete.")
     mse = mean_square_error(y_pred, y)
     plot_validation(X, y, X, y_pred)
     return mse
