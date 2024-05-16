@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from torch.utils.tensorboard import SummaryWriter
 import pandas as pd
 import numpy as np
+import pickle
 
 # Define the Dataset class
 class CSVDataset(torch.utils.data.Dataset):
@@ -60,19 +61,24 @@ class MLP(nn.Module):
         return self.layers(x)
 
 # Function to load the model
-def load_model(model_path):
+def load_model():
     model = MLP()
-    # TODO: add saving of scaler transform
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load('mlp_model.pth'))
     model.eval()
+    with open('scaler_X.pkl', 'rb') as f:
+        model.train_scaler_X = pickle.load(f)
+        
+    with open('scaler_y.pkl', 'rb') as f:
+        model.train_scaler_y = pickle.load(f)
     return model
 
 # Inference function
 def predict_effective_stiffness(X):
-    model = load_model('mlp_model.pth')
+    model = load_model()
     if not torch.is_tensor(X):
         X = torch.tensor(X, dtype=torch.float32)
     X = model.train_scaler_X.transform(X)
+    X = torch.tensor(X, dtype=torch.float32)
     with torch.no_grad():
         prediction = model(X)
     return model.train_scaler_y.inverse_transform(prediction.numpy())
@@ -138,11 +144,13 @@ if __name__ == '__main__':
 
     # Save the model
     torch.save(mlp.state_dict(), 'mlp_model.pth')
+    with open('scaler_X.pkl', 'wb') as f:
+        pickle.dump(mlp.train_scaler_X, f)
+    with open('scaler_y.pkl', 'wb') as f:
+        pickle.dump(mlp.train_scaler_y, f)
 
     # Close the TensorBoard writer
     writer.close()
-
-# TODO: add data inverse normalization to MLP inference, json file?
 
 # TODO: same scaling for validation and training
 
