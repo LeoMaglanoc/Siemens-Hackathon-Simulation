@@ -9,6 +9,8 @@ import preprocess_data as ppd
 def plot_train_and_val_data():
     X1, y1 = ppd.get_data(ppd.PATHTRAININGDATA)
     X2, y2 = ppd.get_data(ppd.PATHVALIDATIONDATA)
+    num_samples_train = X1.shape[0]
+    num_samples_val = X2.shape[0]
     num_plots = X1.shape[1]
     num_rows = (num_plots + 1) // 2
     fig, axs = plt.subplots(num_rows, 2)
@@ -21,6 +23,7 @@ def plot_train_and_val_data():
             axs[i, j].set_ylabel(ppd.TARGET + f" in 1e3 MPa")
 
     fig.legend(loc='lower center', handles=[training_data_handle, validation_data_handle], ncol=2)
+    fig.suptitle('Simulation data - ' + str(num_samples_train) + ' training samples ' + str(num_samples_val) + ' validation samples')
     plt.tight_layout()
     plt.show()
 
