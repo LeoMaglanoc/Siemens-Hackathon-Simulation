@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-import pandas as pad
+import pandas as pd
 
 PATHTRAININGDATA = './data/training.csv'
 PATHVALIDATIONDATA = './data/validation.csv'
@@ -18,6 +18,15 @@ def preprocess_data(X: np.array) -> np.array:
     scaler = StandardScaler()
     return scaler.fit_transform(X)
 
+def check_double_rows() -> bool:
+    train_data = pd.read_csv(PATHTRAININGDATA)
+    val_data = pd.read_csv(PATHVALIDATIONDATA)
+    train_data_without_first_column = train_data.iloc[:, 1:]
+    val_data_without_first_column = val_data.iloc[:, 1:]
+    equal_rows = val_data_without_first_column.isin(train_data_without_first_column).all(axis=1)
+    print(f"Found {equal_rows.sum()} equal rows in the validation data.")
+    return equal_rows.any()
+
 
 if __name__ == '__main__':
-    pass
+    check_double_rows()
