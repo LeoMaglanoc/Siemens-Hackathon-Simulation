@@ -1,9 +1,9 @@
 import os
-import glob
-import xml.etree.ElementTree as ET
-import csv
 import numpy as np
 import random
+import pandas as pd
+import xml.etree.ElementTree as ET
+import csv
 
 def parse_xml_file(xml_file):
     tree = ET.parse(xml_file)
@@ -56,12 +56,6 @@ def parse_xml_file(xml_file):
         elif paramname == "Strength_Test_Cube_V1_1_Mass":
             mass = value
 
-    '''
-    if mass is not None and volume is not None:
-        data['density'] = mass / volume
-        data['porosity'] = 1 - (volume / (h_total_z * w_total_y * d_total_x)) 
-    '''
-        
     # Extract Displacement Nodal Magnitude values
     displacement_values = []
     for response in root.findall('.//Response[@type="Solutions"][@output="Displacement - Nodal"][@component="Magnitude"]'):
@@ -88,40 +82,32 @@ def main(folder_path, train_csv, val_csv):
         data['ID'] = i + 1  # Assign a unique ID to each data point
         all_data.append(data)
 
+    # Convert the data to a pandas DataFrame
+    df = pd.DataFrame(all_data)
+
+    # Remove duplicate rows
+    df = df.drop_duplicates()
+
     # Shuffle the data randomly
-    random.shuffle(all_data)
+    df = df.sample(frac=1).reset_index(drop=True)
 
     # Split the data into training (70%) and validation (30%) sets
-    split_idx = int(len(all_data) * 0.7)
-    train_data = all_data[:split_idx]
-    val_data = all_data[split_idx+1:]
-
-    # Define the CSV file headers
-    headers = ['ID', 'lattice_d_cell', 'lattice_d_rod', 'lattice_number_cells_x', 'scaling_factor_YZ', 'effective_stiffness']
+    split_idx = int(len(df) * 0.7)
+    train_data = df.iloc[:split_idx]
+    val_data = df.iloc[split_idx:]
 
     # Write the training data to the CSV file
-    with open(train_csv, mode='w', newline='') as train_csv_file:
-        writer = csv.DictWriter(train_csv_file, fieldnames=headers)
-        writer.writeheader()
-        for row in train_data:
-            writer.writerow(row)
+    train_data.to_csv(train_csv, index=False)
 
     # Write the validation data to the CSV file
-    with open(val_csv, mode='w', newline='') as val_csv_file:
-        writer = csv.DictWriter(val_csv_file, fieldnames=headers)
-        writer.writeheader()
-        for row in val_data:
-            writer.writerow(row)
+    val_data.to_csv(val_csv, index=False)
 
     print(f"Training data written to {train_csv}")
     print(f"Validation data written to {val_csv}")
 
 # Example usage
 if __name__ == "__main__":
-    folder_path = 'data/simulation_data_3'  # Replace with the path to your folder containing XML files
+    folder_path = 'data'  # Replace with the path to your folder containing XML files
     train_csv = 'data/training.csv'  # Replace with the desired output training CSV file path
     val_csv = 'data/validation.csv'  # Replace with the desired output validation CSV file path
     main(folder_path, train_csv, val_csv)
-
-# e_solid = 210.000
-# dichte_solid = 7.85 * 10^-6
