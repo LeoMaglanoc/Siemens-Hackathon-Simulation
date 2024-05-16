@@ -5,13 +5,14 @@
 import numpy as np
 import knn_regression_algorithm as knnr
 import random_forest_algorithm as rf
+import gaussian_process_regressian_algorithm as gpr
 import mlp as mlp_module
 import torch
 
 def knn(X):
     result_knn = knnr.predict_effective_stiffness(X)
     print("Knn: " + str(result_knn[0]) + " MPa")
-    return result_knn[0]    
+    return result_knn[0]
 
 def random_forest(X):
     result_rf = rf.predict_effective_stiffness(X)
@@ -26,6 +27,11 @@ def mlp(X):
 def point_cloud_nn(X):
     return 0
 
+def gp(X):
+    result_gpr = gpr.predict_effective_stiffness(X)
+    print("Gpr: " + str(result_gpr[0]) + " MPa")
+    return result_gpr[0]
+
 if __name__ == '__main__':
     """
     Estimate the effective stiffness with different machine learning methods
@@ -39,4 +45,6 @@ if __name__ == '__main__':
     mlp(X)
     # TODO: point_cloud_nn
     point_cloud_nn(X)
+
+    gp(X)
 
