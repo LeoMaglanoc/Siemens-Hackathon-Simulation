@@ -44,10 +44,11 @@ class MLP(nn.Module):
     def __init__(self):
         super().__init__()
         self.layers = nn.Sequential(
-            nn.Linear(4, 4),  
-            nn.Softplus(),
-            nn.Linear(4, 4),
-            nn.Softplus()
+            nn.Linear(4, 1000),  
+            nn.ReLU(),
+            nn.Linear(1000, 1000),
+            nn.ReLU(),
+            nn.Linear(1000, 1)
         )
         self.train_scaler_X = None 
         self.train_scaler_y = None
@@ -61,6 +62,7 @@ class MLP(nn.Module):
 # Function to load the model
 def load_model(model_path):
     model = MLP()
+    # TODO: add saving of scaler transform
     model.load_state_dict(torch.load(model_path))
     model.eval()
     return model
@@ -95,7 +97,7 @@ if __name__ == '__main__':
 
     # Define the loss function and optimizer
     loss_function = nn.MSELoss()
-    optimizer = torch.optim.Adam(mlp.parameters(), lr=1e0)
+    optimizer = torch.optim.Adam(mlp.parameters(), lr=1e-3)
 
     # Initialize TensorBoard writer
     writer = SummaryWriter(log_dir='runs/')
@@ -140,7 +142,11 @@ if __name__ == '__main__':
     # Close the TensorBoard writer
     writer.close()
 
-# TODO: add data inverse normalization to MLP inference
+# TODO: add data inverse normalization to MLP inference, json file?
+
+# TODO: same scaling for validation and training
+
+# TODO: am I correctly calculating validation loss (in the non-normalized range?)
 
 # inference script which takes saved model and dummy inputs and outputs stiffness
 
