@@ -8,32 +8,23 @@ import pickle
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
 from sklearn.preprocessing import StandardScaler
+import preprocess_data as pd
+import matplotlib.pyplot as plt
 
 GPRMODELNAME = 'gpr_model.pth'
 PATHTRAININGDATA = './data/training.csv'
 PATHVALIDATIONDATA = './data/validation.csv'
+# KERNEL = DotProduct() + WhiteKernel()
+# KERNEL = DotProduct()
+KERNEL = None
 
 def preprocess_data(X: np.array) -> np.array:
     scaler = StandardScaler()
     return scaler.fit_transform(X)
 
-def get_training_data():
-    a = np.genfromtxt(PATHTRAININGDATA, dtype=None, delimiter=',', skip_header=1, names=['id', 'lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','effective_stiffness'])
-    X = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ']]).T
-    X = preprocess_data(X)
-    y = np.array(a['effective_stiffness'])
-    return X, y
-
-def get_validation_data():
-    a = np.genfromtxt(PATHVALIDATIONDATA, dtype=None, delimiter=',', skip_header=1, names=['id', 'lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','effective_stiffness'])
-    X = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ']]).T
-    X = preprocess_data(X)
-    y = np.array(a['effective_stiffness'])
-    return X, y
-
 def create_gpr_model():
-    X, y = get_training_data()
-    kernel = DotProduct() + WhiteKernel()
+    X, y = pd.get_data(pd.PATHTRAININGDATA)
+    kernel = KERNEL
     gpr_model = GaussianProcessRegressor(kernel=kernel, random_state=0).fit(X, y)
     gpr_Pickle = open(GPRMODELNAME, 'wb') # open in binary mode!
     pickle.dump(gpr_model, gpr_Pickle)
@@ -45,14 +36,32 @@ def predict_effective_stiffness(X: np.array):
     return gpr_model.predict(X)
 
 def mean_square_error(y_pred: np.array, y_gt: np.array):
-    return np.sqrt(np.mean((y_pred-y_gt)**2))
+    return np.mean((y_pred-y_gt)**2)
 
 def validate_gpr_model():
-    X, y = get_validation_data()
-    mse = mean_square_error(predict_effective_stiffness(X), y)
+    X, y = pd.get_data(pd.PATHVALIDATIONDATA)
+    y_pred = predict_effective_stiffness(X)
+    mse = mean_square_error(y_pred, y)
+    plot_validation(X, y, X, y_pred)
     return mse
 
+def plot_validation(X1: np.array, y1: np.array, X2: np.array, y2: np.array):
+    num_plots = X1.shape[1]
+    num_rows = (num_plots + 1) // 2
+    fig, axs = plt.subplots(num_rows, 2)
+
+    for i in range(num_rows):
+        for j in range(2):
+            training_data_handle = axs[i, j].scatter(X1[:,2*i+j], y1/1e3, label='Expected E_eff')
+            validation_data_handle = axs[i, j].scatter(X2[:,2*i+j], y2/1e3, label='Predicted E_eff', marker="*")
+            axs[i, j].set_xlabel(pd.PARAMETERS[2*i+j])
+            axs[i, j].set_ylabel(pd.TARGET + f" in 1e3 MPa")
+
+    fig.legend(loc='lower center', handles=[training_data_handle, validation_data_handle], ncol=2)
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == '__main__':
     create_gpr_model()
-    print(validate_gpr_model())
+    mse = validate_gpr_model()
+    print(mse)
