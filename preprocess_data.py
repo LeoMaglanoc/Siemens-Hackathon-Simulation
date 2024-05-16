@@ -14,9 +14,15 @@ def get_data(path):
     y = np.array(a[TARGET])
     return X, y
 
-def preprocess_data(X: np.array) -> np.array:
+def preprocess_data(X: np.array):
     scaler = StandardScaler()
-    return scaler.fit_transform(X)
+    scaler.fit(X)
+    print(f"Mean: {scaler.mean_}, Variance: {scaler.var_}")
+    return scaler.transform(X)
+
+
+def scale_data(X: np.array, mean, std):
+    return (X - mean) / std 
 
 def check_double_rows() -> bool:
     train_data = pd.read_csv(PATHTRAININGDATA)

@@ -68,8 +68,8 @@ def create_rf_model():
     mse_errors = np.zeros(MAX_DEPTH)
     rf_models = []
     X_train, y_train = ppd.get_data(ppd.PATHTRAININGDATA)
-    X_train = ppd.preprocess_data(X_train)
     print("Nr of training samples: " + str(X_train.shape[0]))
+    X_train = ppd.preprocess_data(X_train)
     for depth in range(1, MAX_DEPTH+1):
         rf_models.append(train_rf_model(X_train, y_train, depth))
         mse_errors[depth-1] = validate_rf_model(rf_models[depth-1])
@@ -78,11 +78,12 @@ def create_rf_model():
     print("Optimal depth: " + str(optimal_depth))
     save_rf_model(rf_models[optimal_depth-1])
     plot_loss(mse_errors)
-    
 
 
 def predict_effective_stiffness(X: np.array):
-    X = ppd.preprocess_data(X)
+    scaler_mean = np.array([2.375,0.6875,2.0,6.0])
+    scaler_std = np.array([0, 0.07755208, 0, 0])
+    X = ppd.scale_data(X, scaler_mean, scaler_std)
     rf_model = pickle.load(open(RFMODELNAME, 'rb'))
     return rf_model.predict(X)
 
