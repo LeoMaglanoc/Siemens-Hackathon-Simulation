@@ -4,6 +4,7 @@
 
 import numpy as np
 import knn_regression_algorithm as knnr
+import random_forest_algorithm as rf
 import mlp as mlp_module
 
 def knn(X):
@@ -12,7 +13,9 @@ def knn(X):
     return result_knn[0]    
 
 def random_forest(X):
-    return 0
+    result_rf = rf.predict_effective_stiffness(X)
+    print("Random Forest: " + str(result_rf[0]) + " MPa")
+    return result_rf[0]
 
 def mlp(X):
     result_mlp = mlp_module.predict_effective_stiffness(X)
@@ -30,7 +33,6 @@ if __name__ == '__main__':
     """
     X = np.array([[2.375,0.7,2.0,6.0]])
     knn(X)
-    # TODO: random forest
     random_forest(X)
     # TODO: mlp
     mlp(X)

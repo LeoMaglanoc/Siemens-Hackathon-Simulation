@@ -4,26 +4,12 @@
 """
 
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 import numpy as np
 import pickle
+import preprocess_data as pd
 
 RFMODELNAME        = 'rf_model.pth'
-PATHTRAININGDATA   = './data/training.csv'
-PATHVALIDATIONDATA = './data/validation.csv'
-
-
-def get_training_data():
-    a = np.genfromtxt(PATHTRAININGDATA, dtype=None, delimiter=',', skip_header=1, names=['id','lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','effective_stiffness'])
-    X = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ'],]).T
-    y = np.array(a['effective_stiffness'])
-    return X, y
-
-
-def preprocess_data(X: np.array) -> np.array:
-    scaler = StandardScaler()
-    return scaler.fit_transform(X)
 
 
 def train_rf_model(X_train, y_train, depth: int) -> RandomForestRegressor:
@@ -33,10 +19,8 @@ def train_rf_model(X_train, y_train, depth: int) -> RandomForestRegressor:
 
 
 def validate_rf_model(rf_model: RandomForestRegressor) -> float:
-    a = np.genfromtxt(PATHVALIDATIONDATA, dtype=None, delimiter=',', skip_header=1, names=['id','lattice_d_cell','lattice_d_rod','lattice_number_cells_x','scaling_factor_YZ','effective_stiffness'])
-    X_val = np.array([a['lattice_d_cell'],a['lattice_d_rod'],a['lattice_number_cells_x'],a['scaling_factor_YZ'],]).T
-    X_val = preprocess_data(X_val)
-    y_val = np.array(a['effective_stiffness'])
+    X_val, y_val = pd.get_data(pd.PATHVALIDATIONDATA)
+    X_val = pd.preprocess_data(X_val)
     mse = np.mean((rf_model.predict(X_val) - y_val) ** 2)
     return mse
 
@@ -52,8 +36,8 @@ def create_rf_model():
     print("Creating random forest model...")
     mse_errors = np.zeros(9)
     rf_models = []
-    X_train, y_train = get_training_data()
-    X_train = preprocess_data(X_train)
+    X_train, y_train = pd.get_data(pd.PATHTRAININGDATA)
+    X_train = pd.preprocess_data(X_train)
     for depth in range(1, 10):
         rf_models.append(train_rf_model(X_train, y_train, depth))
         mse_errors[depth-1] = validate_rf_model(rf_models[depth-1])
@@ -64,7 +48,7 @@ def create_rf_model():
 
 
 def predict_effective_stiffness(X: np.array):
-    X = preprocess_data(X)
+    X = pd.preprocess_data(X)
     rf_model = pickle.load(open(RFMODELNAME, 'rb'))
     return rf_model.predict(X)
 
