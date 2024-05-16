@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import numpy as np
 import pickle
+from time import time
 
 # Define the Dataset class
 class CSVDataset(torch.utils.data.Dataset):

@@ -2,6 +2,7 @@ import streamlit as st
 import pyvista as pv
 from stpyvista import stpyvista
 import tempfile
+import random_forest_algorithm as rf
 
 import numpy as np
 import knn_regression_algorithm as knnr
@@ -9,7 +10,34 @@ import mlp as mlp_module
 import torch
 import pandas as pd
 
+
 st.set_page_config(layout="wide")
+
+def typewrite(text:str):
+    with open("assets/codepen.css") as f:
+        # The CSS from the codepen was stored in codepen.css
+        css = f.read()
+
+    with open("assets/codepen.js") as f:
+        # The JS from the codepen was stored in codepen.js
+        js = f.read()
+
+    html = f"""
+    <!DOCTYPE html>
+    <head>
+    <style>
+        {css}
+    </style>
+    </head>
+    <body>
+        <p id="typewrite" data-content="">{text}</p>
+        <script>
+            {js}
+        </script>
+    </body>
+    </html>
+    """
+    return html
 
 def knn(X):
     result_knn = knnr.predict_effective_stiffness(X)
@@ -17,7 +45,9 @@ def knn(X):
     return result_knn[0]    
 
 def random_forest(X):
-    return 0
+    result_rf = rf.predict_effective_stiffness(X)
+    print("Random Forest: " + str(result_rf[0]) + " MPa")
+    return result_rf[0]
 
 def mlp(X):
     result_mlp = mlp_module.predict_effective_stiffness(X)
@@ -44,6 +74,14 @@ pv.global_theme.allow_empty_mesh = True
 
 def delmodel():
     del st.session_state.fileuploader
+
+try_text = """Welcome to the demo! We are the best team. 
+ Our project is amazing.
+ Team Smart 3D-Printing 
+ Jiyoun Jo Leo Malaz Sebastian Yan-Ling Yuejie Umut"""
+
+typewrited = typewrite(try_text)
+st.components.v1.html(typewrited, height=400, width=1100, scrolling=True)
 
 st.title('Effective Stiffness Prediction Platform')
 
