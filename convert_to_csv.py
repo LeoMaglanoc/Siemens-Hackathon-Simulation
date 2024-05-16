@@ -76,12 +76,6 @@ def main(folder_path, train_csv, val_csv):
 
     all_data = []
 
-    # Process each XML file
-    for i, xml_file in enumerate(xml_files):
-        data = parse_xml_file(xml_file)
-        data['ID'] = i + 1  # Assign a unique ID to each data point
-        all_data.append(data)
-
     # Convert the data to a pandas DataFrame
     df = pd.DataFrame(all_data)
 

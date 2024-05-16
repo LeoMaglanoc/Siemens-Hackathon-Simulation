@@ -4,13 +4,13 @@ import pandas as pd
 
 PATHTRAININGDATA = './data/training.csv'
 PATHVALIDATIONDATA = './data/validation.csv'
-PARAMETERS = ['id', 'lattice_d_cell', 'lattice_d_rod', 'lattice_number_cells_x', 'scaling_factor_YZ']
+PARAMETERS = ['lattice_d_cell', 'lattice_d_rod', 'lattice_number_cells_x', 'scaling_factor_YZ']
 TARGET = 'effective_stiffness'
 
 
 def get_data(path):
     a = np.genfromtxt(path, dtype=None, delimiter=',', skip_header=1, names=PARAMETERS + [TARGET])
-    X = np.array([a[PARAMETERS[1]],a[PARAMETERS[2]],a[PARAMETERS[3]],a[PARAMETERS[4]]]).T
+    X = np.array([a[PARAMETERS[0]],a[PARAMETERS[1]],a[PARAMETERS[2]],a[PARAMETERS[3]]]).T
     y = np.array(a[TARGET])
     return X, y
 
