@@ -1,5 +1,6 @@
 data/simulation_data_1/*.xml
 data/simulation_data_2/*.xml
 data/simulation_data_3/*.xml
+data/Hackathon_heeds_results_studies_Computer3/*.xml
 __pycache__
 runs
