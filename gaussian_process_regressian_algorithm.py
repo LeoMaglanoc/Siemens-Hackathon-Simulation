@@ -26,7 +26,11 @@ def preprocess_data(X: np.array) -> np.array:
 def create_gpr_model():
     X, y = pd.get_data(pd.PATHTRAININGDATA)
     kernel = KERNEL
+    start = time.perf_counter()
     gpr_model = GaussianProcessRegressor(kernel=kernel, random_state=0).fit(X, y)
+    end = time.perf_counter()
+    duration = end-start
+    print("Fitting took " + str(duration) + " sec to complete.")
     gpr_Pickle = open(GPRMODELNAME, 'wb') # open in binary mode!
     pickle.dump(gpr_model, gpr_Pickle)
     gpr_Pickle.close()
