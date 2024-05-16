@@ -7,6 +7,8 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import mean_squared_error
+
 
 
 KNNMODELNAME = 'knn_model.pth'
@@ -16,6 +18,42 @@ PARAMETERS = ['id', 'lattice_d_cell', 'lattice_d_rod', 'lattice_number_cells_x',
 TARGET = 'effective_stiffness'
 MAXNEIGHBORS = 7 # Can be set hihger if more training data is available
 
+def load_data(path):
+    data = np.genfromtxt(path, delimiter=',', skip_header=1)
+    X_test = data[:, 1:-1]  # Exclude id and target columns
+    y_test = data[:, -1]  # Last column is the target
+    return X_test, y_test
+
+# means = np.array([2.375, 0.6875, 2.0, 6.0])
+# variances = np.array([0.0, 0.07755208, 0.0, 0.0])
+
+def preprocess_data(X: np.array) -> np.array:
+    #scaler = StandardScaler()
+    X = (X-np.array( [2.48046875, 0.6421875,  2.03125,    4.90625   ]  ))/np.array([0.02842712, 0.06189209, 0.03027344, 2.02246094])
+
+
+
+    
+    return X
+
+def evaluate_knn_model_on_test():
+    # Load the trained KNN model
+    knn_model = pickle.load(open(KNNMODELNAME, 'rb'))
+    
+    # Load the test dataset
+    X_test, y_test = load_data(PATHVALIDATIONDATA)
+
+    X_test = preprocess_data(X_test)
+    
+    # Standardize the test data
+    
+    # Make predictions on the standardized test set
+    y_pred = knn_model.predict(X_test)
+    
+    # Calculate Mean Squared Error
+    mse = mean_squared_error(y_test, y_pred)
+    
+    print(f'Mean Squared Error on Test Data: {mse:.5f}')
 
 def get_data(path):
     a = np.genfromtxt(path, dtype=None, delimiter=',', skip_header=1, names=PARAMETERS + [TARGET])
@@ -89,6 +127,8 @@ def create_knn_model():
 def predict_effective_stiffness(X: np.array):
     knn_model = pickle.load(open(KNNMODELNAME, 'rb'))
     return knn_model.predict(X)
+
+
 
 if __name__ == '__main__':
     create_knn_model()

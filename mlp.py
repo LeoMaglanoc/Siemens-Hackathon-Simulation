@@ -77,6 +77,25 @@ def predict_effective_stiffness(X):
         prediction = model(X)
     return model.train_scaler_y.inverse_transform(prediction.numpy())
 
+def evaluate_model_on_test():
+    model = load_model('mlp_model.pth')
+    test_dataset = CSVDataset('data/validation.csv')
+    test_loader = DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False, num_workers=0)
+    model.eval()
+    test_loss = 0.0
+
+    with torch.no_grad():
+        for i, data in enumerate(test_loader):
+            inputs, targets = data
+            outputs = model(inputs)
+            loss_function = nn.MSELoss()
+
+            loss = loss_function(outputs, targets)
+            test_loss += loss.item()
+    
+    average_test_loss = test_loss / len(test_loader.dataset)
+    print(f'Average test loss: {average_test_loss:.5f}')
+
 # Main script
 if __name__ == '__main__':
     # Set fixed random number seed
