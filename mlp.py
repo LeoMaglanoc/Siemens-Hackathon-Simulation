@@ -2,7 +2,6 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from sklearn.preprocessing import StandardScaler
-from torch.utils.tensorboard import SummaryWriter
 import pandas as pd
 import numpy as np
 import pickle
@@ -105,8 +104,6 @@ if __name__ == '__main__':
     loss_function = nn.MSELoss()
     optimizer = torch.optim.Adam(mlp.parameters(), lr=1e-3)
 
-    # Initialize TensorBoard writer
-    writer = SummaryWriter(log_dir='runs/')
 
     # Run the training loop
     for epoch in range(100):
@@ -121,7 +118,6 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
             current_loss += loss.item()
-            writer.add_scalar('Loss/train', loss.item(), epoch * len(train_loader) + i)
 
         print(f'Epoch {epoch+1} loss: {current_loss / len(train_loader)}')
 
@@ -137,8 +133,6 @@ if __name__ == '__main__':
             outputs = mlp(inputs)
             loss = loss_function(outputs, targets)
             val_loss += loss.item()
-            writer.add_scalar('Loss/val', loss.item(), epoch * len(val_loader) + i)
-
     average_val_loss = val_loss / len(val_loader.dataset)
     print(f'Average validation loss: {average_val_loss:.3f}')
 
@@ -149,8 +143,6 @@ if __name__ == '__main__':
     with open('scaler_y.pkl', 'wb') as f:
         pickle.dump(mlp.train_scaler_y, f)
 
-    # Close the TensorBoard writer
-    writer.close()
 
 # TODO: same scaling for validation and training
 
