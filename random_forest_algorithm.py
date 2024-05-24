@@ -20,7 +20,7 @@ def train_rf_model(X_train, y_train, depth: int) -> RandomForestRegressor:
 
 
 def validate_rf_model(rf_model: RandomForestRegressor) -> float:
-    X_val, y_val = ppd.get_data(ppd.PATHVALIDATIONDATA)
+    X_val, y_val = ppd.get_data(ppd.PATHVALIDATIONDATA_SINGLE)
     X_val = ppd.preprocess_data(X_val)
     y_calc = rf_model.predict(X_val)
     mse = np.mean((y_calc - y_val) ** 2)
@@ -67,7 +67,7 @@ def create_rf_model():
     print("Creating random forest model...")
     mse_errors = np.zeros(MAX_DEPTH)
     rf_models = []
-    X_train, y_train = ppd.get_data(ppd.PATHTRAININGDATA)
+    X_train, y_train = ppd.get_data(ppd.PATHTRAININGDATA_SINGLE)
     print("Nr of training samples: " + str(X_train.shape[0]))
     X_train = ppd.preprocess_data(X_train)
     for depth in range(1, MAX_DEPTH+1):

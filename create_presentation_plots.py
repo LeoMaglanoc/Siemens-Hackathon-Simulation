@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import preprocess_data as ppd
 
 def plot_train_and_val_data():
-    X1, y1 = ppd.get_data(ppd.PATHTRAININGDATA)
-    X2, y2 = ppd.get_data(ppd.PATHVALIDATIONDATA)
+    X1, y1 = ppd.get_data(ppd.PATHTRAININGDATA_SINGLE)
+    X2, y2 = ppd.get_data(ppd.PATHVALIDATIONDATA_SINGLE)
     num_samples_train = X1.shape[0]
     num_samples_val = X2.shape[0]
     num_plots = X1.shape[1]

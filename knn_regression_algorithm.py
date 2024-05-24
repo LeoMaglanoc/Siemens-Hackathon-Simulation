@@ -21,7 +21,7 @@ def train_knn_model(X: np.array, y: np.array, k_neighbors: int) -> KNeighborsReg
 
 
 def validate_knn_model(knn_model: KNeighborsRegressor) -> float:
-    X_val, y_val = pd.get_data(pd.PATHVALIDATIONDATA)
+    X_val, y_val = pd.get_data(pd.PATHVALIDATIONDATA_SINGLE)
     y_calc = knn_model.predict(X_val)
     mse = np.mean((y_calc - y_val) ** 2)
     plot_validation(X_val, y_val, X_val, y_calc)
@@ -65,7 +65,7 @@ def create_knn_model():
     print("Creating knn model...")
     mse_errors = np.zeros(MAXNEIGHBORS)
     knn_models = []
-    X_train, y_train = pd.get_data(pd.PATHTRAININGDATA)
+    X_train, y_train = pd.get_data(pd.PATHTRAININGDATA_SINGLE)
     for k_neighbors in range(1, MAXNEIGHBORS+1, 1):
         knn_models.append(train_knn_model(X_train, y_train, k_neighbors))
         mse_errors[k_neighbors-1] = validate_knn_model(knn_models[k_neighbors-1])

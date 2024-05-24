@@ -2,7 +2,8 @@ import pandas as pd
 
 # Load the CSV file into a DataFrame
 file_path = 'path_to_your_file.csv'
-df = pd.read_csv('data/training.csv')
+df = pd.read_csv('data/validation.csv')
+df = df.drop('ID', axis=1)
 
 # Display the DataFrame (optional)
 print("DataFrame:")
