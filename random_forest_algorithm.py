@@ -1,3 +1,8 @@
+"""
+    The main function creates and saves a random forest model trained with provided data
+    With the function "predict_effective_stiffness" you have access to the latest trained model and can predict values with it
+"""
+
 from sklearn.ensemble import RandomForestRegressor
 import numpy as np
 import pickle
@@ -15,7 +20,7 @@ def train_rf_model(X_train, y_train, depth: int) -> RandomForestRegressor:
 
 
 def validate_rf_model(rf_model: RandomForestRegressor) -> float:
-    X_val, y_val = ppd.get_data(ppd.PATHVALIDATIONDATA)
+    X_val, y_val = ppd.get_data(ppd.PATHVALIDATIONDATA_SINGLE)
     X_val = ppd.preprocess_data(X_val)
     y_calc = rf_model.predict(X_val)
     mse = np.mean((y_calc - y_val) ** 2)
@@ -62,9 +67,9 @@ def create_rf_model():
     print("Creating random forest model...")
     mse_errors = np.zeros(MAX_DEPTH)
     rf_models = []
-    X_train, y_train = ppd.get_data(ppd.PATHTRAININGDATA)
-    X_train = ppd.preprocess_data(X_train)
+    X_train, y_train = ppd.get_data(ppd.PATHTRAININGDATA_SINGLE)
     print("Nr of training samples: " + str(X_train.shape[0]))
+    X_train = ppd.preprocess_data(X_train)
     for depth in range(1, MAX_DEPTH+1):
         rf_models.append(train_rf_model(X_train, y_train, depth))
         mse_errors[depth-1] = validate_rf_model(rf_models[depth-1])
@@ -73,11 +78,12 @@ def create_rf_model():
     print("Optimal depth: " + str(optimal_depth))
     save_rf_model(rf_models[optimal_depth-1])
     plot_loss(mse_errors)
-    
 
 
 def predict_effective_stiffness(X: np.array):
-    X = ppd.preprocess_data(X)
+    scaler_mean = np.array([2.51,0.616,2.4,4.6]) # np.array([2.375,0.6875,2.0,6.0])
+    scaler_std = np.array([0.0324, 0.066344, 0.0384, 2.16]) # np.array([0, 0.07755208, 0, 0])
+    X = ppd.scale_data(X, scaler_mean, scaler_std)
     rf_model = pickle.load(open(RFMODELNAME, 'rb'))
     return rf_model.predict(X)
 

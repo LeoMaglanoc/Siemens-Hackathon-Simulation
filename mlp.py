@@ -75,13 +75,15 @@ def load_model():
 # Inference function
 def predict_effective_stiffness(X):
     model = load_model()
+    t1 = time()
     if not torch.is_tensor(X):
         X = torch.tensor(X, dtype=torch.float32)
     X = model.train_scaler_X.transform(X)
     X = torch.tensor(X, dtype=torch.float32)
     with torch.no_grad():
         prediction = model(X)
-    return model.train_scaler_y.inverse_transform(prediction.numpy())
+    t2 = time()
+    return model.train_scaler_y.inverse_transform(prediction.numpy()), t2-t1
 
 # Main script
 if __name__ == '__main__':

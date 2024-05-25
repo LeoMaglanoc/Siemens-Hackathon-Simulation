@@ -7,21 +7,11 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsRegressor
+import preprocess_data as pd
 
 
 KNNMODELNAME = 'knn_model.pth'
-PATHTRAININGDATA = './data/training.csv'
-PATHVALIDATIONDATA = './data/validation.csv'
-PARAMETERS = ['id', 'lattice_d_cell', 'lattice_d_rod', 'lattice_number_cells_x', 'scaling_factor_YZ']
-TARGET = 'effective_stiffness'
 MAXNEIGHBORS = 7 # Can be set hihger if more training data is available
-
-
-def get_data(path):
-    a = np.genfromtxt(path, dtype=None, delimiter=',', skip_header=1, names=PARAMETERS + [TARGET])
-    X = np.array([a[PARAMETERS[1]],a[PARAMETERS[2]],a[PARAMETERS[3]],a[PARAMETERS[4]]]).T
-    y = np.array(a[TARGET])
-    return X, y
 
 
 def train_knn_model(X: np.array, y: np.array, k_neighbors: int) -> KNeighborsRegressor:
@@ -31,7 +21,7 @@ def train_knn_model(X: np.array, y: np.array, k_neighbors: int) -> KNeighborsReg
 
 
 def validate_knn_model(knn_model: KNeighborsRegressor) -> float:
-    X_val, y_val = get_data(PATHVALIDATIONDATA)
+    X_val, y_val = pd.get_data(pd.PATHVALIDATIONDATA_SINGLE)
     y_calc = knn_model.predict(X_val)
     mse = np.mean((y_calc - y_val) ** 2)
     plot_validation(X_val, y_val, X_val, y_calc)
@@ -54,8 +44,8 @@ def plot_validation(X1: np.array, y1: np.array, X2: np.array, y2: np.array):
         for j in range(2):
             training_data_handle = axs[i, j].scatter(X1[:,2*i+j], y1/1e3, label='Expected E_eff')
             validation_data_handle = axs[i, j].scatter(X2[:,2*i+j], y2/1e3, label='Predicted E_eff', marker="*")
-            axs[i, j].set_xlabel(PARAMETERS[2*i+j])
-            axs[i, j].set_ylabel(TARGET + f" in 1e3 MPa")
+            axs[i, j].set_xlabel(pd.PARAMETERS[2*i+j])
+            axs[i, j].set_ylabel(pd.TARGET + f" in 1e3 MPa")
 
     fig.legend(loc='lower center', handles=[training_data_handle, validation_data_handle], ncol=2)
     plt.tight_layout()
@@ -75,7 +65,7 @@ def create_knn_model():
     print("Creating knn model...")
     mse_errors = np.zeros(MAXNEIGHBORS)
     knn_models = []
-    X_train, y_train = get_data(PATHTRAININGDATA)
+    X_train, y_train = pd.get_data(pd.PATHTRAININGDATA_SINGLE)
     for k_neighbors in range(1, MAXNEIGHBORS+1, 1):
         knn_models.append(train_knn_model(X_train, y_train, k_neighbors))
         mse_errors[k_neighbors-1] = validate_knn_model(knn_models[k_neighbors-1])
