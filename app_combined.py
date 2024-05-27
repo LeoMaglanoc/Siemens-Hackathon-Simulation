@@ -135,7 +135,7 @@ col1.write(f"Scaling_factor_YZ is {Scaling_factor_YZ}")
 X = np.array([[Lattice_d_cell,Lattice_d_rod,Lattice_number_cells_x,Scaling_factor_YZ]])
 knn_pred = knn(X)
 # TODO: random forest
-rf_pred = random_forest(X)
+#rf_pred = random_forest(X)
 # TODO: mlp
 mlp_pred, prediction_time = mlp(X)
 # TODO: point_cloud_nn
@@ -148,8 +148,8 @@ col2.header(f'**Processing took :red[{1000*prediction_time:.6f} milliseconds].**
 
 #col2.header(f'**In the simulation, one experiment takes at least hours for a very simple material.**')
 
-col2.header(f'Different Model Predictions:')
-show_df = pd.DataFrame(np.array([[knn_pred, rf_pred, mlp_pred]]), columns = ['KNN Regressor', 'Random Forest Regressor', 'MLP Regressor'], index=['Prediction'])
+col2.header(f'Different Model Predictions for Effective Stiffness:')
+show_df = pd.DataFrame(np.array([[knn_pred, mlp_pred]]), columns = ['KNN Regressor', 'MLP Regressor'], index=['Effective Stiffness'])
 
 col2.table(show_df)
 #col2.header(f'**KNN Regressor Effective Stiffness Prediction is {knn_pred:.3f}**')
@@ -158,7 +158,7 @@ col2.table(show_df)
 
 #col2.header(f'**MLP Regressor Effective Stiffness Prediction is {mlp_pred:.3f}**')
 
-col2.header('Material Details:')
+#col2.header('Material Details:')
 
 col2.header(f'**Porosity: {porosity_value:.3f}**')
 
